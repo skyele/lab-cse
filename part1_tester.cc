@@ -122,7 +122,7 @@ int test_indirect()
     if (buf.compare(buf_2) != 0) {
         std::cout << "error get large file, not consistent with put large file : " << 
             buf << " <-> " << buf_2 << "\n";
-        return 4;
+	return 4;
     }
     std::string buf2_2;
     if (ec->get(id2, buf2_2) != extent_protocol::OK) {

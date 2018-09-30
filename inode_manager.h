@@ -90,6 +90,8 @@ class inode_manager {
   void write_file(uint32_t inum, const char *buf, int size);
   void remove_file(uint32_t inum);
   void getattr(uint32_t inum, extent_protocol::attr &a);
+  uint32_t get_blockid_by_blocks_offset(inode *ino, int i);
+  void set_blockid_by_blocks_offset(inode *ino, int i, uint32_t block_id);
 };
 
 #endif
