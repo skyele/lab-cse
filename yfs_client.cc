@@ -41,6 +41,7 @@ yfs_client::filename(inum inum)
 bool
 yfs_client::isfile(inum inum)
 {
+
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
@@ -220,7 +221,10 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
 	
 	string parentDir;
 	ec->get(parent, parentDir);
+	cout<<"before append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
 	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
+	
+	cout<<"after append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
 	ec->put(parent, parentDir);
 	return r;
 }
@@ -290,6 +294,7 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 	std::string tmpDirStr;
 
 	ec->get(dir,dirCont);	
+	cout << " the dir content : "<<dirCont<<endl;
     	while(dirCont.find(";") != dirCont.npos){
 		tmpDirStr = dirCont.substr(0,dirCont.find(";"));
 		dirCont = dirCont.substr(dirCont.find(";")+1);

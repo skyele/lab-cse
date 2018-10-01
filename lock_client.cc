@@ -30,12 +30,14 @@ lock_client::stat(lock_protocol::lockid_t lid)
 lock_protocol::status
 lock_client::acquire(lock_protocol::lockid_t lid)
 {
+	printf("in acquire in lock client\n");//just test
 	// Your lab2 part2 code goes here
 }
 
 lock_protocol::status
 lock_client::release(lock_protocol::lockid_t lid)
 {
+	printf("in release in lock client\n");//just test
 	// Your lab2 part2 code goes here
 }
 

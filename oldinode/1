@@ -108,6 +108,7 @@ inode_manager::alloc_inode(uint32_t type)
    * note: the normal inode block should begin from the 2nd inode block.
    * the 1st is used for root_dir, see inode_manager::inode_manager().
    */
+	printf("in alloc_inode in inode_manager\n");//just test
  	inode *ino;  	
 	for(int i=1;i<INODE_NUM;i++){
 		ino = get_inode(i);
@@ -158,6 +159,7 @@ inode_manager::free_inode(uint32_t inum)
 struct inode* 
 inode_manager::get_inode(uint32_t inum)
 {
+	printf("in get_inode in inode_manager\n");//just test
   struct inode *ino, *ino_disk;
   char buf[BLOCK_SIZE];
 
@@ -186,6 +188,7 @@ inode_manager::get_inode(uint32_t inum)
 void
 inode_manager::put_inode(uint32_t inum, struct inode *ino)
 {
+	printf("in put_inode in inode_manager\n");//just test
   char buf[BLOCK_SIZE];
   struct inode *ino_disk;
 
@@ -212,6 +215,7 @@ inode_manager::read_file(uint32_t inum, char **buf_out, int *size)
    * note: read blocks related to inode number inum,
    * and copy them to buf_Out
    */	
+	printf("in read_file in inode_manager\n");//just test
 	inode *ino = get_inode(inum);
 	if((ino == NULL) | (ino->type == 0))
 		return;
@@ -241,6 +245,7 @@ inode_manager::write_file(uint32_t inum, const char *buf, int size)
    * you need to consider the situation when the size of buf 
    * is larger or smaller than the size of original inode
    */
+	printf("in write_file in inode_manager\n");//just test
 	inode *ino = get_inode(inum);
 	if(ino == NULL){
 		printf("ino is null in write file \n");
@@ -250,14 +255,16 @@ inode_manager::write_file(uint32_t inum, const char *buf, int size)
 	//new larger than origin
 	if((int)ino->size < size){
 		int oldCeilIndex = DIVID_CEIL(ino->size,BLOCK_SIZE);
+		printf("1");//just test
 		for(int i=0; i < DIVID_CEIL(size,BLOCK_SIZE); i++){
 			memset(bufToFile,0,BLOCK_SIZE);
-			if(i == (DIVID_CEIL(size,BLOCK_SIZE))-1&&size%BLOCK_SIZE!=0)
+			if(i == (DIVID_CEIL(size,BLOCK_SIZE)-1))
 				memcpy(bufToFile,&buf[i*BLOCK_SIZE],size%BLOCK_SIZE);
 			else
 				memcpy(bufToFile,&buf[i*BLOCK_SIZE],BLOCK_SIZE);
-		
 			uint32_t blockid = 0;
+			if(*bufToFile == 0)
+				printf("this is a null!\n");//just test
 			if(oldCeilIndex==0||i>=oldCeilIndex){
 				blockid = bm->alloc_block();
 				set_blockid_by_blocks_offset(ino,i,blockid);
@@ -265,7 +272,6 @@ inode_manager::write_file(uint32_t inum, const char *buf, int size)
 			else{
 				blockid = get_blockid_by_blocks_offset(ino,i);
 			}
-			printf("the bufToFile : %s\n",bufToFile);//just est
 			bm->write_block(blockid,bufToFile);
 		}	
 	}
@@ -301,6 +307,7 @@ inode_manager::getattr(uint32_t inum, extent_protocol::attr &a)
    * note: get the attributes of inode inum.
    * you can refer to "struct attr" in extent_protocol.h
    */
+	printf("in getattr in inode_manager\n");//just test
  	inode *ino = get_inode(inum);
 	if(ino == NULL){
 		a.type = 0;
@@ -321,6 +328,7 @@ inode_manager::remove_file(uint32_t inum)
    * your code goes here
    * note: you need to consider about both the data block and inode of the file
    */
+	printf("in remove in inode_manager\n");//just test
 	inode *ino = get_inode(inum);
 	if(ino == NULL)
 		return;
