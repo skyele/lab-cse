@@ -76,6 +76,7 @@ sub dircheck {
     my %h;
     my $f;
     while(defined($f = readdir(D))){
+	print "hello in dircheck!\n";
         if(!defined($h{$f})){
             $h{$f} = 0;
         }

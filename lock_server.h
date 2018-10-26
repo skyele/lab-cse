@@ -13,6 +13,7 @@ class lock_server {
 
  protected:
   int nacquire;
+  std::map <lock_protocol::lockid_t, int> lock_map;
 
  public:
   lock_server();
