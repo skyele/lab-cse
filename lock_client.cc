@@ -7,7 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
-
+using namespace std;
 lock_client::lock_client(std::string dst)
 {
   sockaddr_in dstsock;
@@ -30,14 +30,22 @@ lock_client::stat(lock_protocol::lockid_t lid)
 lock_protocol::status
 lock_client::acquire(lock_protocol::lockid_t lid)
 {
-	printf("in acquire in lock client\n");//just test
+	int r;
+	lock_protocol::status ret = cl->call(lock_protocol::acquire, cl->id(), lid, r);
+	
+  	VERIFY (ret == lock_protocol::OK);
+	return ret;
 	// Your lab2 part2 code goes here
 }
 
 lock_protocol::status
 lock_client::release(lock_protocol::lockid_t lid)
 {
-	printf("in release in lock client\n");//just test
+	int r;
+	lock_protocol::status ret = cl->call(lock_protocol::release, cl->id(), lid, r);
+  	VERIFY (ret == lock_protocol::OK);
+	return ret;
+
 	// Your lab2 part2 code goes here
 }
 

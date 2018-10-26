@@ -212,9 +212,11 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
      * note: lookup is what you need to check if file exist;
      * after create file or dir, you must remember to modify the parent infomation.
      */
+	lc->acquire(parent);
     	int r = OK; 
 	bool found;
 	if(lookup(parent,name,found,ino_out) == EXIST){
+		lc->release(parent);
 		return EXIST;
 	}
 	ec->create(extent_protocol::T_FILE,ino_out);
@@ -226,12 +228,14 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
 	
 	cout<<"after append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
 	ec->put(parent, parentDir);
+	lc->release(parent);
 	return r;
 }
 
 int
 yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 {
+	lc->acquire(parent);
 	int r = OK;
 	
     /*
@@ -241,6 +245,7 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
      */
 	bool found;
 	if(lookup(parent,name,found,ino_out) == EXIST){
+		lc->release(parent);
 		return EXIST;
 	}
 	ec->create(extent_protocol::T_DIR,ino_out);
@@ -249,6 +254,7 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 	ec->get(parent,parentDir);
 	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
 	ec->put(parent, parentDir);
+	lc->release(parent);
 	return r;
 }
 
@@ -350,6 +356,7 @@ int
 yfs_client::write(inum ino, size_t size, off_t off, const char *data,
         size_t &bytes_written)
 {
+	lc->acquire(ino);
     int r = OK;
 
     /*
@@ -366,6 +373,7 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
 		string offBlank(blank,off);
 		newFile = offBlank+newFile;
 		ec->put(ino,newFile);
+		lc->release(ino);
 		return r;
 	}
 	string origin;
@@ -375,11 +383,13 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
 		if((off+size)<attr.size){
 			newFile = origin.substr(0,off)+newFile+origin.substr(off+size);
 			ec->put(ino,newFile);
+			lc->release(ino);
 			return r;
 		}
 		else{
 			newFile = origin.substr(0,off)+newFile;
 			ec->put(ino,newFile);
+			lc->release(ino);
 			return r;
 		}
 	}
@@ -389,13 +399,16 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
 		string offblank(blank,off-attr.size);
 		newFile = origin+offblank+newFile;
 		ec->put(ino,newFile);
+		lc->release(ino);
 		return r;
 	}
+	lc->release(ino);
 	return r;
 }
 
 int yfs_client::unlink(inum parent,const char *name)
 {
+	lc->acquire(parent);
     int r = OK;
 
     /*
@@ -410,8 +423,10 @@ int yfs_client::unlink(inum parent,const char *name)
 	std::list<dirent>::iterator itor;
 
 	lookup(parent,name,found,ino_out);
-	if(found == false)
+	if(found == false){
+		lc->release(parent);
 		return NOENT;
+	}
 	ec->remove(ino_out);
 	
 	string newEnt;
@@ -427,6 +442,7 @@ int yfs_client::unlink(inum parent,const char *name)
 		itor++;
 	}
 	ec->put(parent,newEnt);
+	lc->release(parent);
     	return r;
 }
 
