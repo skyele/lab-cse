@@ -164,6 +164,7 @@ main(int argc, char *argv[])
 
     dst = argv[1]; 
 
+	printf("the Test number is %d\n",atoi(argv[2]));
     if (argc > 2) {
       test = atoi(argv[2]);
       if(test < 1 || test > 5){
@@ -178,11 +179,15 @@ main(int argc, char *argv[])
     printf("cache lock client\n");
     for (int i = 0; i < nt; i++) lc[i] = new lock_client_cache(dst);
 
+	printf("1\n");//just test
     if(!test || test == 1){
+      printf("test 1\n");
       test1();
     }
 
+	printf("2\n");//just test
     if(!test || test == 2){
+      printf("test 2\n");
       // test2
       for (int i = 0; i < nt; i++) {
 	int *a = new int (i);
@@ -194,6 +199,7 @@ main(int argc, char *argv[])
       }
     }
 
+	printf("3\n");//just test
     if(!test || test == 3){
       printf("test 3\n");
       
@@ -208,6 +214,7 @@ main(int argc, char *argv[])
       }
     }
 
+	printf("4\n");//just test
     if(!test || test == 4){
       printf("test 4\n");
       
@@ -222,6 +229,7 @@ main(int argc, char *argv[])
       }
     }
 
+	printf("5\n");//just test
     if(!test || test == 5){
       printf("test 5\n");
       
