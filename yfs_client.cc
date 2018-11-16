@@ -186,7 +186,7 @@ release:
 int
 yfs_client::setattr(inum ino, size_t size)
 {
-	lc->acquire(inum);
+	lc->acquire(ino);
     int r = OK;
 
     /*
@@ -208,7 +208,7 @@ yfs_client::setattr(inum ino, size_t size)
 		origin = origin+appendStr;
 	}
 	ec->put(ino,origin);
-	lc->release(inum);
+	lc->release(ino);
    	return r;
 }
 
@@ -301,7 +301,7 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 int
 yfs_client::readdir(inum dir, std::list<dirent> &list)
 {
-	lc->acquire(parent);
+	lc->acquire(dir);
 	int r = OK;
     /*
      * your code goes here.
@@ -321,14 +321,14 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 		tmpDirent.inum = n2i(tmpDirStr.substr(tmpDirStr.find(":")+1));
 		list.push_back(tmpDirent);
 	}
-	lc->release(parent);
+	lc->release(dir);
 	return r;
 }
 
 int
 yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 {
-	lc->acquire(parent);
+	lc->acquire(ino);
     int r = OK;
 
     /*
@@ -339,7 +339,7 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 	ec->getattr(ino,attr);
 	if(attr.size == 0 || off >= attr.size){
 		data = "";
-		lc->release(parent);
+		lc->release(ino);
 		return r;
 	}
 	
@@ -351,7 +351,7 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 	else{
 		data = origin.substr(off,size);
 	}
-	lc->release(parent);
+	lc->release(ino);
 	return r;
 }
 
@@ -471,9 +471,11 @@ int yfs_client::unlink(inum parent,const char *name)
  **/
 int
 yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_out){
+	lc->acquire(parent);
 	int r = OK;
 	bool found;
 	if(lookup(parent,name,found,ino_out) == EXIST){
+		lc->release(parent);
 		return EXIST;
 	}
 
@@ -485,6 +487,7 @@ yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_ou
 	ec->get(parent, parentDir);
 	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
 	ec->put(parent, parentDir);
+	lc->release(parent);
 	return r;
 }
 
