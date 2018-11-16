@@ -147,6 +147,7 @@ test5(void *x)
 int
 main(int argc, char *argv[])
 {
+	printf("in lock_tester!\n");//just test
     int r;
     pthread_t th[nt];
     int test = 0;
@@ -163,8 +164,8 @@ main(int argc, char *argv[])
     }
 
     dst = argv[1]; 
-
-	printf("the Test number is %d\n",atoi(argv[2]));
+	
+	//printf("the Test number is %d\n",atoi(argv[2]));
     if (argc > 2) {
       test = atoi(argv[2]);
       if(test < 1 || test > 5){
@@ -177,6 +178,7 @@ main(int argc, char *argv[])
     //printf("simple lock client\n");
     //for (int i = 0; i < nt; i++) lc[i] = new lock_client(dst);
     printf("cache lock client\n");
+	std::cout<<"the dst "<<dst<<std::endl;//just test
     for (int i = 0; i < nt; i++) lc[i] = new lock_client_cache(dst);
 
 	printf("1\n");//just test

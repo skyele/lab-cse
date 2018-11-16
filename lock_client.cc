@@ -30,6 +30,7 @@ lock_client::stat(lock_protocol::lockid_t lid)
 lock_protocol::status
 lock_client::acquire(lock_protocol::lockid_t lid)
 {
+	printf("in lock_client acquire the lid is %d\n",(int)lid);//just test
 	int r;
 	lock_protocol::status ret = cl->call(lock_protocol::acquire, cl->id(), lid, r);
 	

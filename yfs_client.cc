@@ -1,6 +1,7 @@
 // yfs client.  implements FS operations using extent and lock server
 #include "yfs_client.h"
 #include "extent_client.h"
+#include "lock_client_cache.h"
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
@@ -15,7 +16,8 @@ using namespace std;
 yfs_client::yfs_client(std::string extent_dst, std::string lock_dst)
 {
   ec = new extent_client(extent_dst);
-  lc = new lock_client(lock_dst);
+  lc = new lock_client(lock_dst); //lab2
+ // lc = new lock_client_cache(lock_dst); //lab3
   if (ec->put(1, "") != extent_protocol::OK)
       printf("error init root dir\n"); // XYB: init root dir
 }
@@ -128,6 +130,7 @@ release:
 int
 yfs_client::getdir(inum inum, dirinfo &din)
 {
+	lc->acquire(inum);
     int r = OK;
 
     printf("getdir %016llx\n", inum);
@@ -141,6 +144,7 @@ yfs_client::getdir(inum inum, dirinfo &din)
     din.ctime = a.ctime;
 
 release:
+	lc->release(inum);
     return r;
 }
 
@@ -151,6 +155,7 @@ release:
 int
 yfs_client::getsymlink(inum inum, symlinkinfo &slin)
 {
+	lc->acquire(inum);
     int r = OK;
 
     printf("getsymlink %016llx\n", inum);
@@ -165,6 +170,7 @@ yfs_client::getsymlink(inum inum, symlinkinfo &slin)
     slin.size = a.size;
 	
 release:
+	lc->release(inum);
     return r;
 }
 
@@ -180,6 +186,7 @@ release:
 int
 yfs_client::setattr(inum ino, size_t size)
 {
+	lc->acquire(inum);
     int r = OK;
 
     /*
@@ -201,6 +208,7 @@ yfs_client::setattr(inum ino, size_t size)
 		origin = origin+appendStr;
 	}
 	ec->put(ino,origin);
+	lc->release(inum);
    	return r;
 }
 
@@ -261,6 +269,7 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 int
 yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 {
+	lc->acquire(parent);
     int r = OK;
 
     /*
@@ -279,17 +288,20 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 		if(tmpDir.name.compare(std::string(name)) == 0){
 			found = true;
 			ino_out = tmpDir.inum;
+			lc->release(parent);
 			return EXIST;
 		}
 		itor++;
 	}
 	found = false;
+	lc->release(parent);
    	return r;
 }
 
 int
 yfs_client::readdir(inum dir, std::list<dirent> &list)
 {
+	lc->acquire(parent);
 	int r = OK;
     /*
      * your code goes here.
@@ -309,12 +321,14 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 		tmpDirent.inum = n2i(tmpDirStr.substr(tmpDirStr.find(":")+1));
 		list.push_back(tmpDirent);
 	}
+	lc->release(parent);
 	return r;
 }
 
 int
 yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 {
+	lc->acquire(parent);
     int r = OK;
 
     /*
@@ -325,6 +339,7 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 	ec->getattr(ino,attr);
 	if(attr.size == 0 || off >= attr.size){
 		data = "";
+		lc->release(parent);
 		return r;
 	}
 	
@@ -336,6 +351,7 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 	else{
 		data = origin.substr(off,size);
 	}
+	lc->release(parent);
 	return r;
 }
 
@@ -346,9 +362,11 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 int
 yfs_client::readsymlink(inum ino, std::string &data)
 {
+	lc->acquire(ino);
 	int r = OK;
 	
 	ec->get(ino,data);
+	lc->release(ino);
 	return r;
 }
 

@@ -9,7 +9,20 @@
 #include "rpc.h"
 #include "lock_client.h"
 #include "lang/verify.h"
+using namespace std;
 
+class lock_client_state{
+	public:
+	 enum xxstatus { NONE, FREE, LOCKED, ACQUIRE, RELEASE };
+	 int status;
+	 int retry;
+	 int revoke;
+	 lock_client_state(){
+	 	status = lock_client_state::NONE;
+		retry = 0;
+		revoke = 0;
+	 };
+};
 
 // Classes that inherit lock_release_user can override dorelease so that 
 // that they will be called when lock_client releases a lock.
@@ -26,6 +39,14 @@ class lock_client_cache : public lock_client {
   int rlock_port;
   std::string hostname;
   std::string id;
+  map<lock_protocol::lockid_t,lock_client_state> lock_state;
+  map<lock_protocol::lockid_t,pthread_mutex_t> client_mutex;
+  map<lock_protocol::lockid_t,pthread_cond_t> client_cond;
+  map<lock_protocol::lockid_t,pthread_cond_t> retry_cond;
+  map<lock_protocol::lockid_t,int> retry_flag;
+  map<lock_protocol::lockid_t,int> revoke_flag;
+  pthread_mutex_t global_mutex;
+  pthread_cond_t global_cond;
  public:
   static int last_port;
   lock_client_cache(std::string xdst, class lock_release_user *l = 0);
