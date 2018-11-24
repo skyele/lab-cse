@@ -62,7 +62,7 @@ int lock_server_cache::acquire(lock_protocol::lockid_t lid, std::string id, int 
 			}
 		}
 		else if(lock_info.hold == 0 && lock_info.waiting_client.size() != 0){
-			cout<<id<<": warrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrning"<<endl;//just test
+			cout<<id<<": warning"<<endl;//just test
 		}
 		// hold && yes waiting
 		else{

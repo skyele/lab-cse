@@ -16,8 +16,8 @@ using namespace std;
 yfs_client::yfs_client(std::string extent_dst, std::string lock_dst)
 {
   ec = new extent_client(extent_dst);
-  lc = new lock_client(lock_dst); //lab2
- // lc = new lock_client_cache(lock_dst); //lab3
+  //lc = new lock_client(lock_dst); //lab2
+  lc = new lock_client_cache(lock_dst); //lab3
   if (ec->put(1, "") != extent_protocol::OK)
       printf("error init root dir\n"); // XYB: init root dir
 }
@@ -43,19 +43,22 @@ yfs_client::filename(inum inum)
 bool
 yfs_client::isfile(inum inum)
 {
-
+	lc->acquire(inum);
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
+	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_FILE) {
         printf("isfile: %lld is a file\n", inum);
+	lc->release(inum);
         return true;
     } 
     printf("isfile: %lld is not a file\n", inum);
+	lc->release(inum);
     return false;
 }
 /** Your code here for Lab...
@@ -67,18 +70,22 @@ yfs_client::isfile(inum inum)
 bool
 yfs_client::isdir(inum inum)
 {
+	lc->acquire(inum);
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
+	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_DIR) {
         printf("isdir: %lld is a dir\n", inum);
+	lc->release(inum);
         return true;
     } 
     printf("%lld is not a dir\n", inum);
+	lc->release(inum);
     return false;
 }
 
@@ -89,18 +96,22 @@ yfs_client::isdir(inum inum)
 bool
 yfs_client::issymlink(inum inum)
 {
+	lc->acquire(inum);
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
+	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_SYMLINK) {
         printf("issymlink: %lld is a symlink\n", inum);
+	lc->release(inum);
         return true;
     } 
     printf("%lld is not a symlink\n", inum);
+	lc->release(inum);
     return false;
 
 }
@@ -108,6 +119,7 @@ yfs_client::issymlink(inum inum)
 int
 yfs_client::getfile(inum inum, fileinfo &fin)
 {
+	lc->acquire(inum);
     int r = OK;
 
     printf("getfile %016llx\n", inum);
@@ -124,6 +136,7 @@ yfs_client::getfile(inum inum, fileinfo &fin)
     printf("getfile %016llx -> sz %llu\n", inum, fin.size);
 
 release:
+	lc->release(inum);
     return r;
 }
 
@@ -269,7 +282,6 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 int
 yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 {
-	lc->acquire(parent);
     int r = OK;
 
     /*
@@ -288,20 +300,17 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 		if(tmpDir.name.compare(std::string(name)) == 0){
 			found = true;
 			ino_out = tmpDir.inum;
-			lc->release(parent);
 			return EXIST;
 		}
 		itor++;
 	}
 	found = false;
-	lc->release(parent);
    	return r;
 }
 
 int
 yfs_client::readdir(inum dir, std::list<dirent> &list)
 {
-	lc->acquire(dir);
 	int r = OK;
     /*
      * your code goes here.
@@ -321,7 +330,6 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 		tmpDirent.inum = n2i(tmpDirStr.substr(tmpDirStr.find(":")+1));
 		list.push_back(tmpDirent);
 	}
-	lc->release(dir);
 	return r;
 }
 
