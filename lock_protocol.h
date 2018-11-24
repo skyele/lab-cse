@@ -5,6 +5,8 @@
 
 #include "rpc.h"
 
+using namespace std;
+
 class lock_protocol {
  public:
   enum xxstatus { OK, RETRY, RPCERR, NOENT, IOERR };

@@ -10,7 +10,6 @@
 #include "extent_client.h"
 #include <vector>
 
-
 class yfs_client {
   extent_client *ec;
   lock_client *lc;
@@ -31,6 +30,13 @@ class yfs_client {
     unsigned long mtime;
     unsigned long ctime;
   };
+  struct symlinkinfo{
+    unsigned long long size;
+    unsigned long atime;
+    unsigned long mtime;
+    unsigned long ctime; 
+  };
+
   struct dirent {
     std::string name;
     yfs_client::inum inum;
@@ -45,9 +51,11 @@ class yfs_client {
 
   bool isfile(inum);
   bool isdir(inum);
+  bool issymlink(inum);
 
   int getfile(inum, fileinfo &);
   int getdir(inum, dirinfo &);
+  int getsymlink(inum, symlinkinfo &);
 
   int setattr(inum, size_t);
   int lookup(inum, const char *, bool &, inum &);
@@ -55,9 +63,10 @@ class yfs_client {
   int readdir(inum, std::list<dirent> &);
   int write(inum, size_t, off_t, const char *, size_t &);
   int read(inum, size_t, off_t, std::string &);
-  int unlink(inum,const char *);
-  int mkdir(inum , const char *, mode_t , inum &);
-  
+  int unlink(inum, const char *);
+  int mkdir(inum, const char *, mode_t , inum &);
+  int symlink(inum, const char *, const char *, inum &); 
+  int readsymlink(inum, std::string &);
   /** you may need to add symbolic link related methods here.*/
 };
 
