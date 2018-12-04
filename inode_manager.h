@@ -96,7 +96,6 @@ class inode_manager {
   void write_block(blockid_t bid, const char block[BLOCK_SIZE]);
   void complete(uint32_t inum, uint32_t size);
 
-  //lab3
   uint32_t get_blockid_by_blocks_offset(inode *ino, int i);
   void set_blockid_by_blocks_offset(inode *ino, int i, uint32_t block_id);
 };

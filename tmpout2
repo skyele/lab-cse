@@ -1,0 +1,41 @@
+g++ -g -MMD -Wall -I. -I./rpc -Iproto/output -DLAB=4 -DSOL=0 -D_FILE_OFFSET_BITS=64 -std=c++11 -c yfs_client.cc -o yfs_client.o
+g++ -L. -L/usr/local/lib  yfs_client.o extent_client.o fuse.o extent_server.o inode_manager.o lock_client.o lock_client_cache.o rpc/librpc64.a  -lpthread -lprotobuf -lfuse -lrt -ldl -o yfs_client
+yfs_client.o: In function `yfs_client::yfs_client(std::string, std::string)':
+/home/stu/devlop/lab1/yfs_client.cc:18: undefined reference to `extent_client::extent_client(std::string)'
+/home/stu/devlop/lab1/yfs_client.cc:21: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::setattr(unsigned long long, unsigned long)':
+/home/stu/devlop/lab1/yfs_client.cc:213: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+/home/stu/devlop/lab1/yfs_client.cc:223: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::create(unsigned long long, char const*, unsigned int, unsigned long long&)':
+/home/stu/devlop/lab1/yfs_client.cc:246: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+/home/stu/devlop/lab1/yfs_client.cc:251: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::mkdir(unsigned long long, char const*, unsigned int, unsigned long long&)':
+/home/stu/devlop/lab1/yfs_client.cc:275: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+/home/stu/devlop/lab1/yfs_client.cc:277: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::readdir(unsigned long long, std::list<yfs_client::dirent, std::allocator<yfs_client::dirent> >&)':
+/home/stu/devlop/lab1/yfs_client.cc:323: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+yfs_client.o: In function `yfs_client::read(unsigned long long, unsigned long, long, std::string&)':
+/home/stu/devlop/lab1/yfs_client.cc:355: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+yfs_client.o: In function `yfs_client::readsymlink(unsigned long long, std::string&)':
+/home/stu/devlop/lab1/yfs_client.cc:376: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+yfs_client.o: In function `yfs_client::write(unsigned long long, unsigned long, long, char const*, unsigned long&)':
+/home/stu/devlop/lab1/yfs_client.cc:401: undefined reference to `extent_client::put(unsigned long long, std::string)'
+/home/stu/devlop/lab1/yfs_client.cc:406: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+/home/stu/devlop/lab1/yfs_client.cc:411: undefined reference to `extent_client::put(unsigned long long, std::string)'
+/home/stu/devlop/lab1/yfs_client.cc:417: undefined reference to `extent_client::put(unsigned long long, std::string)'
+/home/stu/devlop/lab1/yfs_client.cc:427: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::unlink(unsigned long long, char const*)':
+/home/stu/devlop/lab1/yfs_client.cc:470: undefined reference to `extent_client::put(unsigned long long, std::string)'
+yfs_client.o: In function `yfs_client::symlink(unsigned long long, char const*, char const*, unsigned long long&)':
+/home/stu/devlop/lab1/yfs_client.cc:492: undefined reference to `extent_client::put(unsigned long long, std::string)'
+/home/stu/devlop/lab1/yfs_client.cc:495: undefined reference to `extent_client::get(unsigned long long, std::string&)'
+/home/stu/devlop/lab1/yfs_client.cc:497: undefined reference to `extent_client::put(unsigned long long, std::string)'
+extent_client.o: In function `int rpcc::call<int, unsigned long long, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(unsigned int, unsigned long long const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int&, rpcc::TO)':
+/home/skyele/lab-cse/lab1/./rpc/rpc.h:181: undefined reference to `operator<<(marshall&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+extent_client.o: In function `int rpcc::call<int, unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(unsigned int, unsigned int const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int&, rpcc::TO)':
+/home/skyele/lab-cse/lab1/./rpc/rpc.h:181: undefined reference to `operator<<(marshall&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+extent_client.o: In function `int rpcc::call_m<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(unsigned int, marshall&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, rpcc::TO)':
+/home/skyele/lab-cse/lab1/./rpc/rpc.h:149: undefined reference to `operator>>(unmarshall&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)'
+collect2: error: ld returned 1 exit status
+<builtin>: recipe for target 'yfs_client' failed
+make: *** [yfs_client] Error 1

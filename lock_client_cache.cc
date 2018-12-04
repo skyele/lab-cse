@@ -9,6 +9,8 @@
 #include <string>
 #include <fstream>
 #include "tprintf.h"
+#include <pthread.h>
+using namespace std;
 
 //lab4
 #include <unistd.h>
