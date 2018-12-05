@@ -15,6 +15,7 @@ using namespace std;
 
 yfs_client::yfs_client(std::string extent_dst, std::string lock_dst)
 {
+	cout<<"in yfs_client::init"<<endl;//just test
   ec = new extent_client(extent_dst);
   //lc = new lock_client(lock_dst); //lab2
   lc = new lock_client_cache(lock_dst); //lab3
@@ -43,22 +44,19 @@ yfs_client::filename(inum inum)
 bool
 yfs_client::isfile(inum inum)
 {
-	lc->acquire(inum);
+	cout<<"in yfs_client::isfile"<<endl;//just test
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
-	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_FILE) {
         printf("isfile: %lld is a file\n", inum);
-	lc->release(inum);
         return true;
     } 
     printf("isfile: %lld is not a file\n", inum);
-	lc->release(inum);
     return false;
 }
 /** Your code here for Lab...
@@ -70,22 +68,18 @@ yfs_client::isfile(inum inum)
 bool
 yfs_client::isdir(inum inum)
 {
-	lc->acquire(inum);
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
-	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_DIR) {
         printf("isdir: %lld is a dir\n", inum);
-	lc->release(inum);
         return true;
     } 
     printf("%lld is not a dir\n", inum);
-	lc->release(inum);
     return false;
 }
 
@@ -96,35 +90,30 @@ yfs_client::isdir(inum inum)
 bool
 yfs_client::issymlink(inum inum)
 {
-	lc->acquire(inum);
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
         printf("error getting attr\n");
-	lc->release(inum);
         return false;
     }
 
     if (a.type == extent_protocol::T_SYMLINK) {
         printf("issymlink: %lld is a symlink\n", inum);
-	lc->release(inum);
         return true;
     } 
     printf("%lld is not a symlink\n", inum);
-	lc->release(inum);
     return false;
-
 }
 
 int
 yfs_client::getfile(inum inum, fileinfo &fin)
 {
-	lc->acquire(inum);
     int r = OK;
 
     printf("getfile %016llx\n", inum);
     extent_protocol::attr a;
     if (ec->getattr(inum, a) != extent_protocol::OK) {
+	printf("in getfile error\n");//just test
         r = IOERR;
         goto release;
     }
@@ -136,14 +125,12 @@ yfs_client::getfile(inum inum, fileinfo &fin)
     printf("getfile %016llx -> sz %llu\n", inum, fin.size);
 
 release:
-	lc->release(inum);
     return r;
 }
 
 int
 yfs_client::getdir(inum inum, dirinfo &din)
 {
-	lc->acquire(inum);
     int r = OK;
 
     printf("getdir %016llx\n", inum);
@@ -157,7 +144,6 @@ yfs_client::getdir(inum inum, dirinfo &din)
     din.ctime = a.ctime;
 
 release:
-	lc->release(inum);
     return r;
 }
 
@@ -168,7 +154,6 @@ release:
 int
 yfs_client::getsymlink(inum inum, symlinkinfo &slin)
 {
-	lc->acquire(inum);
     int r = OK;
 
     printf("getsymlink %016llx\n", inum);
@@ -183,7 +168,6 @@ yfs_client::getsymlink(inum inum, symlinkinfo &slin)
     slin.size = a.size;
 	
 release:
-	lc->release(inum);
     return r;
 }
 
@@ -200,6 +184,7 @@ int
 yfs_client::setattr(inum ino, size_t size)
 {
 	lc->acquire(ino);
+	cout<<"in yfs_client::setattr"<<endl;//just test
     int r = OK;
 
     /*
@@ -234,6 +219,7 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
      * after create file or dir, you must remember to modify the parent infomation.
      */
 	lc->acquire(parent);
+	cout<<"in yfs_client::create"<<endl;//just test
     	int r = OK; 
 	bool found;
 	if(lookup(parent,name,found,ino_out) == EXIST){
@@ -257,6 +243,7 @@ int
 yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 {
 	lc->acquire(parent);
+	cout<<"in yfs_client::mkdir"<<endl;//just test
 	int r = OK;
 	
     /*
@@ -282,6 +269,9 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 int
 yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 {
+	cout<<"in yfs_client::lookup"<<endl;//just test
+	printf("the parent inum is %d\n",(int)parent);//just test
+	printf("the name is %s and length : %d\n",name,(int)strlen(name));//just test
     int r = OK;
 
     /*
@@ -297,21 +287,25 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 	itor = list.begin();
 	while(itor != list.end()){
 		dirent tmpDir = *itor;
+		cout<<"int lookup while the tmpdiren filename : "<<tmpDir.name<<" and length :"<<tmpDir.name.length()<<endl;//just test
 		if(tmpDir.name.compare(std::string(name)) == 0){
+			printf("yes is true!\n");//just test
 			found = true;
 			ino_out = tmpDir.inum;
 			return EXIST;
 		}
 		itor++;
 	}
+	printf("why is false?\n");//just test
 	found = false;
-   	return r;
+   	return NOENT;
 }
 
 int
 yfs_client::readdir(inum dir, std::list<dirent> &list)
 {
 	int r = OK;
+	cout<<"in yfs_client::readdir"<<endl;//just test
     /*
      * your code goes here.
      * note: you should parse the dirctory content using your defined format,
@@ -321,13 +315,15 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 	std::string tmpDirStr;
 
 	ec->get(dir,dirCont);	
-	cout << " the dir content : "<<dirCont<<endl;
+	cout << "the dir content : "<<dirCont<<endl;
     	while(dirCont.find(";") != dirCont.npos){
 		tmpDirStr = dirCont.substr(0,dirCont.find(";"));
 		dirCont = dirCont.substr(dirCont.find(";")+1);
 		dirent tmpDirent;
 		tmpDirent.name = tmpDirStr.substr(0,tmpDirStr.find(":"));//filename
 		tmpDirent.inum = n2i(tmpDirStr.substr(tmpDirStr.find(":")+1));
+		cout<<"the dir file name: "<<tmpDirent.name<<endl;//just test
+		cout<<"the dir file inum: "<<tmpDirent.inum<<endl;//just test
 		list.push_back(tmpDirent);
 	}
 	return r;
@@ -337,6 +333,7 @@ int
 yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 {
 	lc->acquire(ino);
+	cout<<"in yfs_client::read"<<endl;//just test
     int r = OK;
 
     /*
@@ -383,6 +380,7 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
         size_t &bytes_written)
 {
 	lc->acquire(ino);
+	cout<<"in yfs_client::write"<<endl;//just test
     int r = OK;
 
     /*
@@ -434,9 +432,8 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
 
 int yfs_client::unlink(inum parent,const char *name)
 {
-	lc->acquire(parent);
     int r = OK;
-
+	cout<<"in yfs_client::unlink"<<endl;//just test
     /*
      * your code goes here.
      * note: you should remove the file using ec->remove,
@@ -450,7 +447,6 @@ int yfs_client::unlink(inum parent,const char *name)
 
 	lookup(parent,name,found,ino_out);
 	if(found == false){
-		lc->release(parent);
 		return NOENT;
 	}
 	ec->remove(ino_out);
@@ -468,7 +464,6 @@ int yfs_client::unlink(inum parent,const char *name)
 		itor++;
 	}
 	ec->put(parent,newEnt);
-	lc->release(parent);
     	return r;
 }
 
@@ -479,6 +474,7 @@ int yfs_client::unlink(inum parent,const char *name)
  **/
 int
 yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_out){
+	cout<<"in yfs_client::symlink"<<endl;//just test
 	lc->acquire(parent);
 	int r = OK;
 	bool found;

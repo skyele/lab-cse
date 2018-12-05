@@ -6,9 +6,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+using namespace std;
 
 extent_client::extent_client(std::string dst)
 {
+	cout<<"in extext_client::init"<<endl;//just test
   sockaddr_in dstsock;
   make_sockaddr(dst.c_str(), &dstsock);
   cl = new rpcc(dstsock);
@@ -56,6 +58,7 @@ extent_client::put(extent_protocol::extentid_t eid, std::string buf)
 {
 	printf("in put in extent_client\n");//just test
 	printf("the put eid : %d\n",(int)eid);//just test
+	cout<<"the input string is "<<buf<<endl;//just test
   extent_protocol::status ret = extent_protocol::OK;
 	int r;
   ret = cl->call(extent_protocol::put, eid, buf, r);

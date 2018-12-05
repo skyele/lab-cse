@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "hello1"
 PART=1
 
 . test-lab4-common.sh

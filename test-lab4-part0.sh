@@ -1,7 +1,6 @@
 #!/bin/bash
 
 . test-lab4-common.sh
-
 check_network() {
   # Check hostname
   echo "Check hostname..."
@@ -82,7 +81,7 @@ check_network() {
       fi
     done
   fi
-
+  
   if [ "x$myname" != "xapp" ]; then
     echo "$myname pass"
     exit 0

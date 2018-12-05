@@ -389,8 +389,17 @@ inode_manager::append_block(uint32_t inum, blockid_t &bid)
 {
   /*
    * your code goes here.
-   */
+   */	
+	inode *ino = get_inode(inum);
+	if(ino == NULL)
+		return;
 
+	int oldCeilIndex = DIVID_CEIL(ino->size,BLOCK_SIZE);
+	char *bufToFile = (char *)malloc(sizeof(char)*BLOCK_SIZE);
+	memset(bufToFile,0,BLOCK_SIZE);
+	bid = bm->alloc_block();
+	set_blockid_by_blocks_offset(ino,oldCeilIndex,bid);
+	bm->write_block(bid,bufToFile);
 }
 
 void
@@ -399,7 +408,13 @@ inode_manager::get_block_ids(uint32_t inum, std::list<blockid_t> &block_ids)
   /*
    * your code goes here.
    */
-
+	inode *ino = get_inode(inum);
+	if(ino == NULL)
+		return;
+	int ceilIndex = DIVID_CEIL(ino->size,BLOCK_SIZE);
+	for(int i=0;i<ceilIndex;i++){
+		block_ids.push_back(get_blockid_by_blocks_offset(ino,i));
+	}
 }
 
 void
@@ -408,7 +423,7 @@ inode_manager::read_block(blockid_t id, char buf[BLOCK_SIZE])
   /*
    * your code goes here.
    */
-
+	bm->read_block(id,buf);
 }
 
 void
@@ -417,7 +432,7 @@ inode_manager::write_block(blockid_t id, const char buf[BLOCK_SIZE])
   /*
    * your code goes here.
    */
-
+	bm->write_block(id,buf);
 }
 
 void
@@ -426,5 +441,8 @@ inode_manager::complete(uint32_t inum, uint32_t size)
   /*
    * your code goes here.
    */
-
+	inode *ino = get_inode(inum);
+	if(ino == NULL)
+		return;
+	ino->size = size;
 }

@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+using namespace std;
+
 extent_server::extent_server() 
 {
   im = new inode_manager();
@@ -16,6 +18,7 @@ extent_server::extent_server()
 
 int extent_server::create(uint32_t type, extent_protocol::extentid_t &id)
 {
+	cout<<"in extent_server::create"<<endl;//just test
   // alloc a new inode and return inum
   id = im->alloc_inode(type);
 
@@ -24,6 +27,7 @@ int extent_server::create(uint32_t type, extent_protocol::extentid_t &id)
 
 int extent_server::put(extent_protocol::extentid_t id, std::string buf, int &)
 {
+	cout<<"in extent_server::put"<<endl;//just test
   id &= 0x7fffffff;
   
   const char * cbuf = buf.c_str();
@@ -35,6 +39,7 @@ int extent_server::put(extent_protocol::extentid_t id, std::string buf, int &)
 
 int extent_server::get(extent_protocol::extentid_t id, std::string &buf)
 {
+	cout<<"in extent_server::get"<<endl;//just test
   printf("extent_server: get %lld\n", id);
 
   id &= 0x7fffffff;
@@ -79,6 +84,7 @@ int extent_server::remove(extent_protocol::extentid_t id, int &)
 
 int extent_server::append_block(extent_protocol::extentid_t id, blockid_t &bid)
 {
+	cout<<"in extent_server::append_block"<<endl;//just test
   id &= 0x7fffffff;
 
   im->append_block(id, bid);
@@ -88,6 +94,7 @@ int extent_server::append_block(extent_protocol::extentid_t id, blockid_t &bid)
 
 int extent_server::get_block_ids(extent_protocol::extentid_t id, std::list<blockid_t> &block_ids)
 {
+	cout<<"in extent_server::get_block_ids"<<endl;//just test
   id &= 0x7fffffff;
 
   im->get_block_ids(id, block_ids);
@@ -97,6 +104,7 @@ int extent_server::get_block_ids(extent_protocol::extentid_t id, std::list<block
 
 int extent_server::read_block(blockid_t id, std::string &buf)
 {
+	cout<<"in extent_server::read_block"<<endl;//just test
   char _buf[BLOCK_SIZE];
 
   im->read_block(id, _buf);
@@ -107,6 +115,7 @@ int extent_server::read_block(blockid_t id, std::string &buf)
 
 int extent_server::write_block(blockid_t id, std::string buf, int &)
 {
+	cout<<"in extent_server::write_block"<<endl;//just test
   if (buf.size() != BLOCK_SIZE)
     return extent_protocol::IOERR;
 
@@ -117,6 +126,7 @@ int extent_server::write_block(blockid_t id, std::string buf, int &)
 
 int extent_server::complete(extent_protocol::extentid_t eid, uint32_t size, int &)
 {
+	cout<<"in extent_server::complete"<<endl;//just test
   im->complete(eid, size);
   return extent_protocol::OK;
 }

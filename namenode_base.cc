@@ -156,6 +156,7 @@ bool NameNode::RecursiveLookup(const string &path, yfs_client::inum &ino, yfs_cl
   }
   last = 1;
   ino = 1;
+	printf("in NameNode::RecursiveLookup before while\n");//just test
   while ((pos = path.find('/', pos)) != string::npos) {
     if (pos != lastpos) {
       string component = path.substr(lastpos, pos - lastpos);
@@ -168,6 +169,8 @@ bool NameNode::RecursiveLookup(const string &path, yfs_client::inum &ino, yfs_cl
     pos++;
     lastpos = pos;
   }
+
+	printf("in NameNode::RecursiveLookup after while\n");//just test
 
   if (lastpos != path.size()) {
     last = ino;
