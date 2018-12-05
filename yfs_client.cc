@@ -222,7 +222,7 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
 	cout<<"in yfs_client::create"<<endl;//just test
     	int r = OK; 
 	bool found;
-	if(lookup(parent,name,found,ino_out) == EXIST){
+	if(lookup(parent,name,found,ino_out) == OK){
 		lc->release(parent);
 		return EXIST;
 	}
@@ -252,7 +252,7 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
      * after create file or dir, you must remember to modify the parent infomation.
      */
 	bool found;
-	if(lookup(parent,name,found,ino_out) == EXIST){
+	if(lookup(parent,name,found,ino_out) == OK){
 		lc->release(parent);
 		return EXIST;
 	}
@@ -292,7 +292,7 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 			printf("yes is true!\n");//just test
 			found = true;
 			ino_out = tmpDir.inum;
-			return EXIST;
+			return OK;
 		}
 		itor++;
 	}
@@ -478,7 +478,7 @@ yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_ou
 	lc->acquire(parent);
 	int r = OK;
 	bool found;
-	if(lookup(parent,name,found,ino_out) == EXIST){
+	if(lookup(parent,name,found,ino_out) == OK){
 		lc->release(parent);
 		return EXIST;
 	}

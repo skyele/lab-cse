@@ -105,14 +105,21 @@ int ReadDelimited(std::string &buf, T &t) {
 bool HrpcRead(int fd, std::string &a1) {
   uint32_t len;
   ssize_t ret;
+	fprintf(stderr,"in HrpcRead1\n");//just test 
+	fflush(stderr);//just test
   if (read(fd, &len, sizeof(len)) != sizeof(len))
     return false;
+	fprintf(stderr,"in HrpcRead2\n");//just test 
+	fflush(stderr);//just test
   len = ntohl(len);
 
   a1.resize(len);
+	fprintf(stderr,"in HrpcRead3\n");//just test 
+	fflush(stderr);//just test
   if ((ret = read(fd, (void *) a1.data(), len)) != len)
     return false;
-
+	fprintf(stderr,"in HrpcRead4\n");//just test 
+	fflush(stderr);//just test
   return true;
 }
 

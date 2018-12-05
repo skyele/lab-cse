@@ -50,24 +50,24 @@ int ReadHeader(int fd) {
 }
 
 int HandleRpc(int fd) {
+	printf("in HandleRpc\n");//just test
   RpcRequestHeaderProto rpc_header;
   RequestHeaderProto header;
   string buf;
+	fprintf(stderr,"hello1\n");//just test
+    fflush(stderr);//just test
   if (!HrpcRead(fd, rpc_header, buf)) {
     fprintf(stderr, "%s:%d read rpc request failed\n", __func__, __LINE__);
     fflush(stderr);
     return -1;
   }
-
   if (rpc_header.callid() < 0)
     return 0;
-
   if (ReadDelimited(buf, header) != 0) {
     fprintf(stderr, "%s:%d read request header failed\n", __func__, __LINE__);
     fflush(stderr);
     return -1;
   }
-
 #define TRY(name) \
   if (strcasecmp(header.methodname().c_str(), #name) == 0) { \
     name##RequestProto req; \
@@ -114,7 +114,6 @@ int HandleRpc(int fd) {
   TRY(SetSafeMode)
   TRY(GetDatanodeReport)
   TRY(DatanodeHeartbeat)
-
   fprintf(stderr, "%s:%d Unknown namenode method %s\n", __func__, __LINE__, header.methodname().c_str());
   fflush(stderr);
   RpcResponseHeaderProto rpc_resp;
@@ -156,7 +155,6 @@ bool NameNode::RecursiveLookup(const string &path, yfs_client::inum &ino, yfs_cl
   }
   last = 1;
   ino = 1;
-	printf("in NameNode::RecursiveLookup before while\n");//just test
   while ((pos = path.find('/', pos)) != string::npos) {
     if (pos != lastpos) {
       string component = path.substr(lastpos, pos - lastpos);
@@ -169,8 +167,6 @@ bool NameNode::RecursiveLookup(const string &path, yfs_client::inum &ino, yfs_cl
     pos++;
     lastpos = pos;
   }
-
-	printf("in NameNode::RecursiveLookup after while\n");//just test
 
   if (lastpos != path.size()) {
     last = ino;
