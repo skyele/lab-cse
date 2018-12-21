@@ -16,6 +16,7 @@ using namespace std;
 yfs_client::yfs_client(std::string extent_dst, std::string lock_dst)
 {
 	cout<<"in yfs_client::init"<<endl;//just test
+	fflush(stdout);//just test 
   ec = new extent_client(extent_dst);
   //lc = new lock_client(lock_dst); //lab2
   lc = new lock_client_cache(lock_dst); //lab3
@@ -45,6 +46,7 @@ bool
 yfs_client::isfile(inum inum)
 {
 	cout<<"in yfs_client::isfile"<<endl;//just test
+	fflush(stdout);//just test 
     extent_protocol::attr a;
 
     if (ec->getattr(inum, a) != extent_protocol::OK) {
@@ -114,6 +116,7 @@ yfs_client::getfile(inum inum, fileinfo &fin)
     extent_protocol::attr a;
     if (ec->getattr(inum, a) != extent_protocol::OK) {
 	printf("in getfile error\n");//just test
+	fflush(stdout);//just test 
         r = IOERR;
         goto release;
     }
@@ -185,6 +188,7 @@ yfs_client::setattr(inum ino, size_t size)
 {
 	lc->acquire(ino);
 	cout<<"in yfs_client::setattr"<<endl;//just test
+	fflush(stdout);//just test 
     int r = OK;
 
     /*
@@ -220,6 +224,7 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
      */
 	lc->acquire(parent);
 	cout<<"in yfs_client::create"<<endl;//just test
+	fflush(stdout);//just test 
     	int r = OK; 
 	bool found;
 	if(lookup(parent,name,found,ino_out) == OK){
@@ -234,6 +239,7 @@ yfs_client::create(inum parent, const char *name, mode_t mode, inum &ino_out)
 	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
 	
 	cout<<"after append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
+	fflush(stdout);//just test 
 	ec->put(parent, parentDir);
 	lc->release(parent);
 	return r;
@@ -244,6 +250,7 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 {
 	lc->acquire(parent);
 	cout<<"in yfs_client::mkdir"<<endl;//just test
+	fflush(stdout);//just test 
 	int r = OK;
 	
     /*
@@ -269,11 +276,10 @@ yfs_client::mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
 int
 yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 {
-	cout<<"in yfs_client::lookup"<<endl;//just test
+	cout<<"in yfs_client::lookuppppppppppppp"<<endl;//just test
 	printf("the parent inum is %d\n",(int)parent);//just test
-	printf("the name is %s and length : %d\n",name,(int)strlen(name));//just test
-    int r = OK;
-
+	printf("the name is %s\n",name);//just test
+	fflush(stdout);//just test 
     /*
      * your code goes here.
      * note: lookup file from parent dir according to name;
@@ -287,16 +293,19 @@ yfs_client::lookup(inum parent, const char *name, bool &found, inum &ino_out)
 	itor = list.begin();
 	while(itor != list.end()){
 		dirent tmpDir = *itor;
-		cout<<"int lookup while the tmpdiren filename : "<<tmpDir.name<<" and length :"<<tmpDir.name.length()<<endl;//just test
+		cout<<"in lookup while the tmpdiren filename : "<<tmpDir.name<<" and length :"<<tmpDir.name.length()<<endl;//just test
+		fflush(stdout);//just test 
 		if(tmpDir.name.compare(std::string(name)) == 0){
 			printf("yes is true!\n");//just test
+			fflush(stdout);//just test 
 			found = true;
 			ino_out = tmpDir.inum;
 			return OK;
 		}
 		itor++;
 	}
-	printf("why is false?\n");//just test
+	printf("no is false?\n");//just test
+	fflush(stdout);//just test 
 	found = false;
    	return NOENT;
 }
@@ -306,6 +315,7 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 {
 	int r = OK;
 	cout<<"in yfs_client::readdir"<<endl;//just test
+	fflush(stdout);//just test 
     /*
      * your code goes here.
      * note: you should parse the dirctory content using your defined format,
@@ -315,7 +325,8 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 	std::string tmpDirStr;
 
 	ec->get(dir,dirCont);	
-	cout << "the dir content : "<<dirCont<<endl;
+	cout << "the dir content : "<<dirCont<<endl;//just test
+	fflush(stdout);//just test 
     	while(dirCont.find(";") != dirCont.npos){
 		tmpDirStr = dirCont.substr(0,dirCont.find(";"));
 		dirCont = dirCont.substr(dirCont.find(";")+1);
@@ -324,6 +335,7 @@ yfs_client::readdir(inum dir, std::list<dirent> &list)
 		tmpDirent.inum = n2i(tmpDirStr.substr(tmpDirStr.find(":")+1));
 		cout<<"the dir file name: "<<tmpDirent.name<<endl;//just test
 		cout<<"the dir file inum: "<<tmpDirent.inum<<endl;//just test
+		fflush(stdout);//just test 
 		list.push_back(tmpDirent);
 	}
 	return r;
@@ -334,6 +346,7 @@ yfs_client::read(inum ino, size_t size, off_t off, std::string &data)
 {
 	lc->acquire(ino);
 	cout<<"in yfs_client::read"<<endl;//just test
+	fflush(stdout);//just test 
     int r = OK;
 
     /*
@@ -381,6 +394,7 @@ yfs_client::write(inum ino, size_t size, off_t off, const char *data,
 {
 	lc->acquire(ino);
 	cout<<"in yfs_client::write"<<endl;//just test
+	fflush(stdout);//just test 
     int r = OK;
 
     /*
@@ -434,6 +448,7 @@ int yfs_client::unlink(inum parent,const char *name)
 {
     int r = OK;
 	cout<<"in yfs_client::unlink"<<endl;//just test
+	fflush(stdout);//just test 
     /*
      * your code goes here.
      * note: you should remove the file using ec->remove,
@@ -475,6 +490,7 @@ int yfs_client::unlink(inum parent,const char *name)
 int
 yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_out){
 	cout<<"in yfs_client::symlink"<<endl;//just test
+	fflush(stdout);//just test 
 	lc->acquire(parent);
 	int r = OK;
 	bool found;
@@ -495,3 +511,262 @@ yfs_client::symlink(inum parent,const char *link, const char *name, inum &ino_ou
 	return r;
 }
 
+int
+yfs_client::_create(inum parent, const char *name, mode_t mode, inum &ino_out)
+{
+    /*
+     * your code goes here.
+     * note: lookup is what you need to check if file exist;
+     * after create file or dir, you must remember to modify the parent infomation.
+     */
+	cout<<"in yfs_client::_create"<<endl;//just test
+	cout<<"the EXIST : "<<EXIST<<" the OK : "<<OK<<endl;//just test
+	fflush(stdout);//just test 
+	
+    	int r = OK; 
+	bool found;
+	if(_lookup(parent,name,found,ino_out) == OK){
+		cout<<"in create exist!!!"<<endl;//just test
+		return EXIST;
+	}
+	ec->create(extent_protocol::T_FILE,ino_out);
+	
+	string parentDir;
+	ec->get(parent, parentDir);
+	cout<<"before append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
+	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
+	
+	cout<<"after append parentDir in create in yfs_client parentDir : "<<parentDir<<endl;
+	ec->put(parent, parentDir);
+	return r;
+}
+
+int
+yfs_client::_read(inum ino, size_t size, off_t off, std::string &data)
+{
+	cout<<"in yfs_client::_read"<<endl;//just test
+	fflush(stdout);//just test 
+    int r = OK;
+
+	extent_protocol::attr attr;
+	ec->getattr(ino,attr);
+	if(attr.size == 0 || off >= attr.size){
+		data = "";
+		return r;
+	}
+	
+	string origin;
+	ec->get(ino,origin);
+	if((off+size) > attr.size){
+		data = origin.substr(off);
+	}
+	else{
+		data = origin.substr(off,size);
+	}
+	return r;
+}
+
+int
+yfs_client::_write(inum ino, size_t size, off_t off, const char *data,
+        size_t &bytes_written)
+{
+	cout<<"in yfs_client::_write"<<endl;//just test
+	fflush(stdout);//just test 
+    int r = OK;
+
+	extent_protocol::attr attr;
+	ec->getattr(ino,attr);
+	string newFile(data,size);
+	if(attr.size == 0){
+		char *blank = (char *)malloc(off*sizeof(char));
+		memset(blank,0,off);
+		string offBlank(blank,off);
+		newFile = offBlank+newFile;
+		ec->put(ino,newFile);
+		return r;
+	}
+	string origin;
+	ec->get(ino,origin);
+	
+	if(off <= (long)attr.size){
+		if((off+size)<attr.size){
+			newFile = origin.substr(0,off)+newFile+origin.substr(off+size);
+			ec->put(ino,newFile);
+			return r;
+		}
+		else{
+			newFile = origin.substr(0,off)+newFile;
+			ec->put(ino,newFile);
+			return r;
+		}
+	}
+	else{
+		char *blank = (char *)malloc(sizeof(char)*(off-attr.size));
+		memset(blank,0,off-attr.size);
+		string offblank(blank,off-attr.size);
+		newFile = origin+offblank+newFile;
+		ec->put(ino,newFile);
+		return r;
+	}
+	return r;
+}
+
+int yfs_client::_unlink(inum parent,const char *name)
+{
+    int r = OK;
+	cout<<"in yfs_client::_unlink"<<endl;//just test
+	fflush(stdout);//just test 
+	bool found;
+	inum ino_out;
+
+	list<dirent> list;
+	std::list<dirent>::iterator itor;
+
+	_lookup(parent,name,found,ino_out);
+	if(found == false){
+		return NOENT;
+	}
+	ec->remove(ino_out);
+	
+	string newEnt;
+	readdir(parent,list);
+	itor = list.begin();
+	while(itor != list.end()){
+		dirent tmpDir = *itor;
+		if(tmpDir.name.compare(std::string(name)) == 0){
+			itor++;
+			continue;
+		}
+		newEnt = newEnt + tmpDir.name+":"+filename(tmpDir.inum)+";";
+		itor++;
+	}
+	ec->put(parent,newEnt);
+    	return r;
+}
+
+int
+yfs_client::_lookup(inum parent, const char *name, bool &found, inum &ino_out)
+{
+	cout<<"in yfs_client::lookuppppppppppppp"<<endl;//just test
+	printf("the parent inum is %d\n",(int)parent);//just test
+	printf("the name is %s\n",name);//just test
+	fflush(stdout);//just test 
+	std::list<dirent> list;
+	std::list<dirent>::iterator itor;
+
+	readdir(parent, list);
+
+	itor = list.begin();
+	while(itor != list.end()){
+		dirent tmpDir = *itor;
+		cout<<"in lookup while the tmpdiren filename : "<<tmpDir.name<<" and length :"<<tmpDir.name.length()<<endl;//just test
+		fflush(stdout);//just test 
+		if(tmpDir.name.compare(std::string(name)) == 0){
+			printf("yes is true!\n");//just test
+			fflush(stdout);//just test 
+			found = true;
+			ino_out = tmpDir.inum;
+			return OK;
+		}
+		itor++;
+	}
+	printf("no is false?\n");//just test
+	fflush(stdout);//just test 
+	found = false;
+   	return NOENT;
+}
+
+int
+yfs_client::_mkdir(inum parent, const char *name, mode_t mode, inum &ino_out)
+{
+	cout<<"in yfs_client::mkdir"<<endl;//just test
+	fflush(stdout);//just test 
+	int r = OK;
+	
+	bool found;
+	if(_lookup(parent,name,found,ino_out) == OK){
+		return EXIST;
+	}
+	ec->create(extent_protocol::T_DIR,ino_out);
+
+	string parentDir;
+	ec->get(parent,parentDir);
+	parentDir = parentDir + name + ":" + filename(ino_out) + ";";
+	ec->put(parent, parentDir);
+	return r;
+}
+
+bool yfs_client::rename(inum src_dir_ino,string src_name, inum dst_dir_ino, string dst_name){
+	printf("in yfs_client::rename\n");//just test
+	cout<<"the src_name : "<<src_name<<endl;//just test
+	cout<<"the dst_name : "<<dst_name<<endl;//just test
+	fflush(stdout);//just test
+	if(src_dir_ino == dst_dir_ino && (src_name.compare(dst_name) == 0)){
+		return false;
+	}
+	printf("rename 1 \n");//just test
+	fflush(stdout);//just test
+	bool found;
+	inum src_ino;
+	_lookup(src_dir_ino,(char *)src_name.data(),found,src_ino);
+	if(found == false)
+		return false;
+
+	if(src_dir_ino == dst_dir_ino){
+		printf("rename 2 \n");//just test
+		fflush(stdout);//just test
+	
+		list<dirent> dir;
+		std::list<dirent>::iterator itor;
+		readdir(src_dir_ino, dir);
+		string newEnt;
+		itor = dir.begin();
+		while(itor != dir.end()){
+			dirent tmpDir = *itor;
+			if(tmpDir.name.compare(src_name) == 0){
+				newEnt = newEnt + dst_name + ":" +filename(tmpDir.inum) + ";";
+				itor++;
+				continue;
+			}
+			newEnt = newEnt + tmpDir.name + ":" + filename(tmpDir.inum)+";";
+			itor++;
+		}
+		ec->put(src_dir_ino,newEnt);
+	}
+	else{	
+		printf("rename 3 \n");//just test
+		fflush(stdout);//just test
+
+		inum tmp_ino;
+		std::list<dirent>::iterator itor;
+		list<dirent> dir;
+		readdir(src_dir_ino, dir);
+		string newEnt;
+		itor = dir.begin();
+		while(itor != dir.end()){
+			dirent tmpDir = *itor;
+			if(tmpDir.name.compare(src_name) == 0){
+				tmp_ino = tmpDir.inum;
+				itor++;
+				continue;
+			}
+			newEnt = newEnt + tmpDir.name + ":" + filename(tmpDir.inum) + ";";
+			itor++;
+		}	
+		ec->put(src_dir_ino,newEnt);
+		newEnt = "";
+		readdir(dst_dir_ino,dir);
+		itor = dir.begin();
+		while(itor != dir.end()){
+			yfs_client::dirent tmpDir = *itor;
+			newEnt = newEnt + tmpDir.name + ":" + filename(tmpDir.inum) + ";";
+			itor++;
+		}
+		newEnt = newEnt + dst_name + ":" + filename(tmp_ino);
+		ec->put(dst_dir_ino,newEnt);
+	}	
+	printf("rename 4 \n");//just test
+	fflush(stdout);//just test
+
+	return true;
+}

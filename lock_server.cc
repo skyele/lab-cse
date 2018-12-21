@@ -16,6 +16,8 @@ pthread_mutex_t mutex_re;
 lock_server::lock_server():
   nacquire (0)
 {
+	pthread_mutex_init(&mutex_ac,NULL);
+	pthread_mutex_init(&mutex_re,NULL);
 }
 
 lock_protocol::status

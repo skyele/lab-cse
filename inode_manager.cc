@@ -390,16 +390,19 @@ inode_manager::append_block(uint32_t inum, blockid_t &bid)
   /*
    * your code goes here.
    */	
+	printf("in inode_manager::append_block\n");//just test
 	inode *ino = get_inode(inum);
 	if(ino == NULL)
 		return;
 
 	int oldCeilIndex = DIVID_CEIL(ino->size,BLOCK_SIZE);
-	char *bufToFile = (char *)malloc(sizeof(char)*BLOCK_SIZE);
-	memset(bufToFile,0,BLOCK_SIZE);
+//	char *bufToFile = (char *)malloc(sizeof(char)*BLOCK_SIZE);
+//	memset(bufToFile,0,BLOCK_SIZE);
 	bid = bm->alloc_block();
 	set_blockid_by_blocks_offset(ino,oldCeilIndex,bid);
-	bm->write_block(bid,bufToFile);
+//	bm->write_block(bid,bufToFile);
+	ino->size += BLOCK_SIZE;
+	put_inode(inum,ino);
 }
 
 void
@@ -445,4 +448,5 @@ inode_manager::complete(uint32_t inum, uint32_t size)
 	if(ino == NULL)
 		return;
 	ino->size = size;
+	put_inode(inum,ino);
 }

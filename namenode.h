@@ -23,6 +23,16 @@ bool operator<(const DatanodeIDProto &, const DatanodeIDProto &);
 bool operator==(const DatanodeIDProto &, const DatanodeIDProto &);
 
 class NameNode {
+  enum status {LIVING,DEATH,REGISTER};
+
+  struct DatanodeInManage {
+	status s;
+	time_t t; 
+	DatanodeInManage():s(REGISTER),t(time((time_t*)NULL)){}
+	DatanodeInManage(status st, time_t ti) :
+		s(st),t(ti){}
+  };
+
   struct LocatedBlock {
     blockid_t block_id;
     uint64_t offset, size;
@@ -52,7 +62,13 @@ private:
   DatanodeIDProto master_datanode;
   std::map<yfs_client::inum, uint32_t> pendingWrite;
 
-  /* Add your member variables/functions here */
+  /* Add your member variables/functions here */ 
+	pthread_mutex_t mutex_map;
+	pthread_mutex_t mutex_list;
+  std::map<DatanodeIDProto,DatanodeInManage> liveDatanode;
+  std::list<blockid_t> blockToRep;
+	void Monitor(DatanodeIDProto);
+	void Replicate(DatanodeIDProto);
 private:
   void GetFileInfo();
   bool RecursiveLookup(const std::string &path, yfs_client::inum &ino, yfs_client::inum &last);
@@ -99,6 +115,7 @@ public:
   void PBSetSafeMode(const SetSafeModeRequestProto &req, SetSafeModeResponseProto &resp);
   void PBGetDatanodeReport(const GetDatanodeReportRequestProto &req, GetDatanodeReportResponseProto &resp);
   void PBDatanodeHeartbeat(const DatanodeHeartbeatRequestProto &req, DatanodeHeartbeatResponseProto &resp);
+	
 };
 
 #endif

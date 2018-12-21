@@ -97,6 +97,8 @@ bool DataNode::ConnectToNN() {
 }
 
 bool DataNode::RegisterOnNamenode() {
+	printf("in DataNode::RegisterOnNamenode\n");//just test
+	fflush(stdout);//just test
   RpcRequestHeaderProto rpc_header;
   RequestHeaderProto header;
   RegisterDatanodeRequestProto req;
@@ -132,6 +134,9 @@ bool DataNode::RegisterOnNamenode() {
 }
 
 bool DataNode::SendHeartbeat() {
+	printf("in DataNode::SendHeartbeat\n");//just test
+	fflush(stdout);//just test
+
   RpcRequestHeaderProto rpc_header;
   RequestHeaderProto header;
   DatanodeHeartbeatRequestProto req;
@@ -174,7 +179,10 @@ static bool ReadOp(CodedInputStream &is, int &op) {
   return true;
 }
 
-bool WritePacket(CodedOutputStream &cos, FileOutputStream &fos, const PacketHeaderProto &header, const void *buf) {
+bool WritePacket(CodedOutputStream &cos, FileOutputStream &fos, const PacketHeaderProto &header, const void *buf) {	
+	printf("in DataNode::WritePacket1\n");//just test
+	fflush(stdout);//just test
+
   uint32_t plen = sizeof(plen) + header.datalen();
   plen = htonl(plen);
   cos.WriteRaw(&plen, sizeof(plen));
@@ -192,6 +200,9 @@ bool WritePacket(CodedOutputStream &cos, FileOutputStream &fos, const PacketHead
 }
 
 bool WritePacket(CodedOutputStream &cos, FileOutputStream &fos, uint64_t offset_in_block, uint64_t seqno, bool last_in_block, uint64_t len, const void *buf) {
+	printf("in DataNode::WritePacket2\n");//just test
+	fflush(stdout);//just test
+
   PacketHeaderProto header;
   header.set_offsetinblock(offset_in_block);
   header.set_seqno(seqno);
@@ -201,6 +212,9 @@ bool WritePacket(CodedOutputStream &cos, FileOutputStream &fos, uint64_t offset_
 }
 
 bool DataNode::_ReadBlock(CodedInputStream &is, CodedOutputStream &os, FileOutputStream &raw_os) {
+	printf("in DataNode::_ReadBlock\n");//just test
+	fflush(stdout);//just test
+
   // Read request
   auto limit = is.ReadLengthAndPushLimit();
   OpReadBlockProto param;
@@ -351,6 +365,9 @@ bool ReadPacket(CodedInputStream &is, PacketHeaderProto &header, string &data) {
 }
 
 bool DataNode::_WriteBlock(CodedInputStream &is, CodedOutputStream &os, FileOutputStream &raw_os) {
+	printf("in DataNode::_WriteBlock\n");//just test
+	fflush(stdout);//just test
+
   // Read request
   auto limit = is.ReadLengthAndPushLimit();
   OpWriteBlockProto param;

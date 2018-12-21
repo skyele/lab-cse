@@ -45,6 +45,7 @@ int DataNode::init(const string &extent_dst, const string &namenode, const struc
 	NewThread(this,&DataNode::InvokeSendHeartBeat,0);
 
 	printf("finish datanode init\n");//just test
+	printf("hello from the outside\n");//just test
 	fflush(stdout);//just test
   return 0;
 }
@@ -54,61 +55,30 @@ bool DataNode::ReadBlock(blockid_t bid, uint64_t offset, uint64_t len, string &b
 	cout<<"in DataNode::ReadBlock"<<endl;//just test
 	fflush(stdout);//just test
 	string raw;
-	int res = ec->read_block(bid,raw);
-	if(res != extent_protocol::OK){	
-		printf("in ReadBlock readblock fail???\n");//just test
-		fflush(stdout);//just test
+	ec->read_block(bid,raw);
+	if(offset >= BLOCK_SIZE){
+		buf = "";
 		return false;
 	}
-	
-	if(len == 0){
-		buf = "";
-	}
-	else{
-		if(offset >= BLOCK_SIZE){
-			buf = "";
-		}
-		else
-			buf = raw.substr(offset,len);
-	}
+	buf = raw.substr(offset,len);
 	return true;
 }
 
 bool DataNode::WriteBlock(blockid_t bid, uint64_t offset, uint64_t len, const string &buf) {
   /* Your lab4 part 2 code */
 	cout<<"in DataNode::WriteBlock"<<endl;//just test
-	cout<<"the offset is : "<<offset<<" the len is : "<<len<<endl;//just test
 	fflush(stdout);//just test
+	if(offset >= BLOCK_SIZE)
+		return false;
 	string raw;
-	int res = ec->read_block(bid,raw);
-	if(res != extent_protocol::OK){
-		printf("in WriteBlock readblock fail???\n");//just test
-		fflush(stdout);//just test
-		return false;
-	}
-	cout<<"the raw string size is : "<<raw.length()<<endl;//just test
-	if(offset == 0){
-		if(offset+len >= BLOCK_SIZE)
-			raw = buf.substr(0,len);
-		else
-			raw = buf.substr(0,len) + raw.substr(len,BLOCK_SIZE - len);
-	}
-	else if(offset < BLOCK_SIZE){
-		if(offset+len >= BLOCK_SIZE)
-			raw = raw.substr(0,offset) + buf.substr(0,len);
-		else
-			raw = raw.substr(0,offset) + buf.substr(0,len) + raw.substr(offset+len);
-	}
+	ec->read_block(bid,raw);
+	
+	if(offset+len >= BLOCK_SIZE)
+		raw = raw.substr(0,offset) + buf.substr(0,len);
 	else
-		raw = raw;
+		raw = raw.substr(0,offset) + buf.substr(0,len) + raw.substr(offset+len);
 	raw = raw.substr(0,BLOCK_SIZE);
-	cout<<"after operation the size is : "<<raw.length()<<endl;//just test
-	res = ec->write_block(bid,raw);	
-	if(res != extent_protocol::OK){
-		printf("in WriteBlock writeblock fail???\n");//just test
-		fflush(stdout);//just test
-		return false;
-	}
+	ec->write_block(bid,raw);
 	return true;
 }
 
@@ -119,8 +89,7 @@ void DataNode::InvokeSendHeartBeat(int r){
 		if(SendHeartbeat() == 0){
 			printf("there is an error in send heart beat\n");//just test
 			fflush(stdout);//just test
-			sleep(1);
-			continue;
+			return;
 		}
 		printf("in while infinit loop\n");//just test
 		fflush(stdout);//just test

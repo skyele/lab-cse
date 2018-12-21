@@ -69,6 +69,13 @@ class yfs_client {
   int symlink(inum, const char *, const char *, inum &); 
   int readsymlink(inum, std::string &);
   /** you may need to add symbolic link related methods here.*/
+  int _lookup(inum, const char *, bool &, inum &);
+  int _create(inum, const char *, mode_t, inum &);
+  int _read(inum, size_t, off_t, std::string &);
+  int _write(inum, size_t, off_t, const char *, size_t &);
+  int _unlink(inum, const char *);
+  int _mkdir(inum, const char *, mode_t , inum &);
+  bool rename(inum,string,inum,string);
 };
 
 #endif 
